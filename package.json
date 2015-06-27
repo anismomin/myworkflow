@@ -1,0 +1,12 @@
+{
+  "name": "myworkflow",
+  "version": "0.0.1",
+  "description": "just learning workflows",
+  "repository": {
+    "type": "git",
+    "url": "?.git"
+  },
+  "author": "anis momin",
+  "license": "ISC"
+}
+ 
