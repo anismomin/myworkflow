@@ -8,15 +8,30 @@ var compass = require('gulp-compass');
 var connect = require('gulp-connect');
 
 
-var coffeeSources = ['components/coffee/tagline.coffee'];
+var env,
+	coffeeSource,
+	scssSource,
+	HtmlSource,
+	JsonSource,
+	jsSource,
+	outputDir,
+	cssStyle;
 
-var scssSource = ['components/sass/style.scss'];
+env = process.env.NODE_ENV || 'development';
 
-var HtmlSource = ['builds/development/*.html'];
+if( env === 'development') {
+	outputDir = 'builds/development/'; 
+	cssStyle = 'expanded';
+} else {
+	outputDir = 'builds/production/';
+	cssStyle = 'compressed';
+}
 
-var JsonSource = ['builds/development/js/*.json'];
-
-var jsSources = [
+coffeeSources = ['components/coffee/tagline.coffee'];
+scssSource = ['components/sass/style.scss'];
+HtmlSource = [outputDir + '*.html'];
+JsonSource = [outputDir + 'js/*.json'];
+jsSources = [
 	'components/scripts/rclick.js',
 	'components/scripts/pixgrid.js',
 	'components/scripts/tagline.js',
@@ -37,11 +52,11 @@ gulp.task('sass', function(){
 	gulp.src(scssSource)
 	.pipe(compass({ 
 		sass: 'components/sass',
-      	image: 'builds/development/images',
-      	style: 'expanded'
+      	image: outputDir +'images',
+      	style: cssStyle
 	})
 	.on('error', gutil.log))
-	.pipe(gulp.dest('builds/development/css'))
+	.pipe(gulp.dest(outputDir +'css'))
 	.pipe(connect.reload())
 });
 
@@ -50,7 +65,7 @@ gulp.task('js', function(){
 	gulp.src(jsSources)
 	.pipe(concat('script.js'))
 	.pipe(browserify())
-	.pipe(gulp.dest('builds/development/js'))
+	.pipe(gulp.dest(outputDir +'/js'))
 	.pipe(connect.reload())
 });
 
@@ -74,7 +89,7 @@ gulp.task('watch', function(){
 
 gulp.task('connect', function(){
 	connect.server({
-		root: 'builds/development',
+		root: outputDir,
 		livereload: true
 	})
 });
