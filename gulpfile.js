@@ -8,6 +8,7 @@ var compass = require('gulp-compass');
 var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
 var minihtml = require('gulp-minify-html');
+var minijson = require('gulp-jsonminify');
 var connect = require('gulp-connect');
 
 var env,
@@ -80,15 +81,17 @@ gulp.task('html', function(){
 });
 
 gulp.task('json', function(){
-	gulp.src(jsonSource)
+	gulp.src('builds/development/js/*.json')
+	.pipe(gulpif( env === 'production', minijson()))
+	.pipe(gulpif( env === 'production', gulp.dest('builds/production/js')))
 	.pipe(connect.reload())
 });
 
 gulp.task('watch', function(){
 	gulp.watch( coffeeSources , ['coffee']);
 	gulp.watch( jsSources , ['js']);
-	gulp.watch( jsonSource , ['json']);
-	gulp.watch( HtmlSource , ['html']);
+	gulp.watch( 'builds/development/js/*.json' , ['json']);
+	gulp.watch( 'builds/development/*.html' , ['html']);
 	gulp.watch( 'components/sass/*.scss' , ['sass']);
 });
 
