@@ -7,6 +7,7 @@ var concat = require('gulp-concat'); // concate file and git return one file
 var compass = require('gulp-compass');
 var gulpif = require('gulp-if');
 var uglify = require('gulp-uglify');
+var minihtml = require('gulp-minify-html');
 var connect = require('gulp-connect');
 
 var env,
@@ -72,7 +73,9 @@ gulp.task('js', function(){
 });
 
 gulp.task('html', function(){
-	gulp.src(HtmlSource)
+	gulp.src('builds/development/*.html')
+	.pipe(gulpif( env === 'production', minihtml()))
+	.pipe(gulp.dest(outputDir))
 	.pipe(connect.reload())
 });
 
