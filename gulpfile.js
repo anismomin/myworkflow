@@ -5,14 +5,15 @@ var mustache = require('mustache');
 var browserify = require('gulp-browserify');
 var concat = require('gulp-concat'); // concate file and git return one file
 var compass = require('gulp-compass');
+var gulpif = require('gulp-if');
+var uglify = require('gulp-uglify');
 var connect = require('gulp-connect');
-
 
 var env,
 	coffeeSource,
 	scssSource,
 	HtmlSource,
-	JsonSource,
+	jsonSource,
 	jsSource,
 	outputDir,
 	cssStyle;
@@ -24,13 +25,13 @@ if( env === 'development') {
 	cssStyle = 'expanded';
 } else {
 	outputDir = 'builds/production/';
-	cssStyle = 'compressed';
+	cssStyle = 'expanded';
 }
 
 coffeeSources = ['components/coffee/tagline.coffee'];
 scssSource = ['components/sass/style.scss'];
 HtmlSource = [outputDir + '*.html'];
-JsonSource = [outputDir + 'js/*.json'];
+jsonSource = [outputDir + 'js/*.json'];
 jsSources = [
 	'components/scripts/rclick.js',
 	'components/scripts/pixgrid.js',
@@ -65,7 +66,8 @@ gulp.task('js', function(){
 	gulp.src(jsSources)
 	.pipe(concat('script.js'))
 	.pipe(browserify())
-	.pipe(gulp.dest(outputDir +'/js'))
+	.pipe(gulpif( env === 'production' , uglify() ))
+	.pipe(gulp.dest(outputDir +'js'))
 	.pipe(connect.reload())
 });
 
@@ -75,14 +77,14 @@ gulp.task('html', function(){
 });
 
 gulp.task('json', function(){
-	gulp.src(JsonSource)
+	gulp.src(jsonSource)
 	.pipe(connect.reload())
 });
 
 gulp.task('watch', function(){
 	gulp.watch( coffeeSources , ['coffee']);
 	gulp.watch( jsSources , ['js']);
-	gulp.watch( JsonSource , ['json']);
+	gulp.watch( jsonSource , ['json']);
 	gulp.watch( HtmlSource , ['html']);
 	gulp.watch( 'components/sass/*.scss' , ['sass']);
 });
