@@ -10,6 +10,16 @@ var uglify = require('gulp-uglify');
 var minihtml = require('gulp-minify-html');
 var minijson = require('gulp-jsonminify');
 var connect = require('gulp-connect');
+var imagemin = require('gulp-imagemin');
+
+// for png
+var pngquant = require('imagemin-pngquant');
+
+//OR
+
+
+var pngcrush = require('imagemin-pngcrush');
+ 
 
 var env,
 	coffeeSource,
@@ -40,6 +50,25 @@ jsSources = [
 	'components/scripts/tagline.js',
 	'components/scripts/template.js'
 ];
+
+
+gulp.task('image', function () {
+    return gulp.src('builds/development/images/**/*.*')
+    .pipe(imagemin({
+        progressive: true,
+        svgoPlugins: [{removeViewBox: false}],
+        //use: [pngquant()]
+        use: [pngcrush({reduce: true})]
+    }))
+    .pipe(gulp.dest('builds/production/images'));
+});
+
+// gulp.task('images', function () {
+//     return gulp.src('builds/development/images/**/*.*')
+//         .pipe(imageminPngcrush({reduce: true})())
+//         .pipe(gulp.dest('builds/production/images'));
+// });
+
 
 // in this task we take coffe script file and pass throught coffe script plugin 
 // that check for error if any error found add to console.or return to same destination
@@ -93,6 +122,7 @@ gulp.task('watch', function(){
 	gulp.watch( 'builds/development/js/*.json' , ['json']);
 	gulp.watch( 'builds/development/*.html' , ['html']);
 	gulp.watch( 'components/sass/*.scss' , ['sass']);
+	gulp.watch( 'builds/development/images/**/*.*' , ['image']);
 });
 
 gulp.task('connect', function(){
@@ -102,4 +132,4 @@ gulp.task('connect', function(){
 	})
 });
 
-gulp.task('default', ['html', 'json', 'coffee', 'sass', 'js' ,'connect', 'watch'])
+gulp.task('default', ['html', 'image', 'json', 'coffee', 'sass', 'js', 'connect', 'watch'])
